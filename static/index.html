@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>zdocs-ai</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header>
+    <h1>zdocs-ai</h1>
+    <p>Stage a GitHub repo, then ask questions about it.</p>
+  </header>
+
+  <main>
+    <section id="stage-panel">
+      <h2>Stage a repository</h2>
+
+      <form id="url-form">
+        <label for="url-input">GitHub repo URL</label>
+        <input id="url-input" type="text" placeholder="https://github.com/owner/repo" required />
+        <button type="submit">Download &amp; stage</button>
+      </form>
+
+      <form id="upload-form">
+        <label for="file-input">Or upload a .zip</label>
+        <input id="file-input" type="file" accept=".zip" required />
+        <button type="submit">Upload &amp; stage</button>
+      </form>
+
+      <p id="stage-status" role="status"></p>
+
+      <h2>Staged repositories</h2>
+      <ul id="repo-list"></ul>
+    </section>
+
+    <section id="chat-panel">
+      <h2>Chat <span id="chat-repo-name"></span></h2>
+      <div id="chat-log"></div>
+      <form id="chat-form">
+        <input id="chat-input" type="text" placeholder="Select a repo to start chatting" disabled required />
+        <button id="chat-send" type="submit" disabled>Send</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+---
+references:
+  - "File: /agent.py"
+generationTime: 2026-08-24T09:39:00.911Z
+---
+sequenceDiagram
+    participant Dev as Developer
+    participant Main as agent.py (Module Load)
+    participant Dotenv as dotenv
+    participant OS as os / environ
+    participant FRT as FileReaderTool
+    participant ADK as LlmAgent (ADK)
+    participant Runner as Runner (External)
+    participant User as User
+    participant Agent as zdocs_assistant
+    participant Tool as FileReaderTool Instance
+
+    %% ─── Module Initialization ───────────────────────────────────────────
+    rect rgb(220, 235, 255)
+        Note over Dev, OS: Module Load & Environment Bootstrap
+        Dev->>Main: import / run module
+        activate Main
+
+        Main->>Dotenv: load_dotenv()
+        activate Dotenv
+        Dotenv-->>OS: populate environment variables from .env
+        deactivate Dotenv
+
+        Main->>OS: os.getenv("ADK_MODEL", "gemini-2.5-flash")
+        activate OS
+        OS-->>Main: MODEL = resolved model string
+        deactivate OS
+
+        Note over Main: SYSTEM_INSTRUCTION string defined
+    end
+
+    %% ─── Agent Construction ──────────────────────────────────────────────
+    rect rgb(220, 255, 230)
+        Note over Dev, ADK: build_agent() Invocation
+        Dev->>Main: build_agent(stage_dir=None, model=None)
+
+        Main->>Main: resolve stage_dir
+        Note over Main: stage_dir = Path(__file__).resolve().parent / "stage"
+
+        Main->>FRT: FileReaderTool(stage_dir=stage_dir)
+        activate FRT
+        FRT-->>Main: file_reader_tool instance
+        deactivate FRT
+
+        Main->>ADK: LlmAgent(name, model, description, instruction, tools)
+        activate ADK
+        Note over ADK: Registers FileReaderTool<br/>Binds SYSTEM_INSTRUCTION<br/>Sets model string
+        ADK-->>Main: agent (zdocs_assistant)
+        deactivate ADK
+
+        Main-->>Dev: returns configured LlmAgent
+        deactivate Main
+    end
+
+    %% ─── Runtime: User Interaction via Runner ────────────────────────────
+    rect rgb(255, 245, 220)
+        Note over Runner, Tool: Runtime Execution (via external Runner)
+        Dev->>Runner: runner.run(agent, user_message)
+        activate Runner
+
+        Runner->>Agent: deliver user message
+        activate Agent
+
+        Note over Agent: Reads SYSTEM_INSTRUCTION:<br/>"Use list_files before reading"
+
+        %% ── Tool: list_files ─────────────────────────────────────────────
+        alt User asks about available files
+            Agent->>Tool: list_files()
+            activate Tool
+            Tool-->>Agent: [list of files in stage/]
+            deactivate Tool
+        else User asks about file content
+            Agent->>Tool: read_file(filename)
+            activate Tool
+
+            critical File resolution inside stage_dir
+                Tool->>Tool: validate path within stage_dir boundary
+                Note over Tool: Prevents directory traversal
+            end
+
+            alt File exists in stage/
+                Tool-->>Agent: file contents (text)
+            else File not found
+                Tool-->>Agent: error: file not in stage directory
+            end
+            deactivate Tool
+        end
+
+        %% ── Agent composes response ──────────────────────────────────────
+        Agent->>Agent: compose answer using file data
+        Note over Agent: Quotes relevant text<br/>from file per instructions
+
+        Agent-->>Runner: final response text
+        deactivate Agent
+
+        Runner-->>User: display response
+        deactivate Runner
+    end

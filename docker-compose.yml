@@ -1,0 +1,18 @@
+name: zdocs-ai
+
+services:
+  minio:
+    image: minio/minio:latest
+    container_name: zdocs-ai-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    volumes:
+      - minio-data:/data
+
+volumes:
+  minio-data:
