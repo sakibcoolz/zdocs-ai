@@ -3,3 +3,14 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .env
+
+# Generated analysis output. The directory itself (and its README) is tracked;
+# everything the Repository Operations Agent writes into it is not.
+/generated-docs/*
+!/generated-docs/README.md
+!/generated-docs/diagrams/
+/generated-docs/diagrams/*
+!/generated-docs/diagrams/.gitkeep
+
+# Local operation cache (JsonFileCache), when enabled.
+.zdocs-cache/

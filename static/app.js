@@ -27,11 +27,14 @@ async function refreshRepoList() {
 function selectRepo(repo) {
   currentRepo = repo;
   currentSessionId = null;
-  $("chat-repo-name").textContent = `— ${repo}`;
+  $("work-repo-name").textContent = repo;
   $("chat-log").innerHTML = "";
   $("chat-input").disabled = false;
   $("chat-send").disabled = false;
   refreshRepoList();
+  // The analysis panel lives in its own script; tell it which repo is active
+  // rather than having the two files share globals.
+  document.dispatchEvent(new CustomEvent("repo-selected", { detail: { repo } }));
 }
 
 function setStatus(message, isError = false) {

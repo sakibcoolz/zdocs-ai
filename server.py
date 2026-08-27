@@ -27,6 +27,7 @@ from google.adk.sessions import InMemorySessionService
 from pydantic import BaseModel
 
 from agent import build_agent
+from api_operations import create_operations_router
 from runner import run_turn
 from tools.github_downloader import download_repo, parse_repo
 from tools.stage_registry import is_staged, list_staged_repos, staged_repo_dir
@@ -39,9 +40,23 @@ USER_ID = "web-user"
 
 STAGE_DIR = Path(__file__).resolve().parent / "stage"
 STATIC_DIR = Path(__file__).resolve().parent / "static"
+# Analysis artefacts (Mermaid diagrams, generated Markdown) are written here,
+# namespaced per repository. Never inside stage/ — analysis is read-only with
+# respect to the code it analyzes.
+GENERATED_DOCS_DIR = Path(
+    os.getenv("ZDOCS_GENERATED_DOCS_DIR")
+    or Path(__file__).resolve().parent / "generated-docs"
+)
 MAX_UPLOAD_BYTES = int(os.getenv("ZDOCS_MAX_UPLOAD_MB", "50")) * 1024 * 1024
 
 app = FastAPI(title="zdocs-ai")
+
+# Repository Operations Agent routes. The directories are passed as callables
+# so the router always reads the current module-level values (tests monkeypatch
+# STAGE_DIR).
+app.include_router(
+    create_operations_router(lambda: STAGE_DIR, lambda: GENERATED_DOCS_DIR)
+)
 
 _runners: dict[str, Runner] = {}
 _runners_lock = threading.Lock()

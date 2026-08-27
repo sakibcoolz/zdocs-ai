@@ -34,16 +34,50 @@
       <ul id="repo-list"></ul>
     </section>
 
-    <section id="chat-panel">
-      <h2>Chat <span id="chat-repo-name"></span></h2>
-      <div id="chat-log"></div>
-      <form id="chat-form">
-        <input id="chat-input" type="text" placeholder="Select a repo to start chatting" disabled required />
-        <button id="chat-send" type="submit" disabled>Send</button>
-      </form>
+    <section id="work-panel">
+      <div class="tabs" role="tablist">
+        <button id="tab-chat" class="tab active" role="tab" aria-selected="true" aria-controls="chat-panel" type="button">Chat</button>
+        <button id="tab-analysis" class="tab" role="tab" aria-selected="false" aria-controls="analysis-panel" type="button">Analysis</button>
+        <span id="work-repo-name" class="repo-badge"></span>
+      </div>
+
+      <div id="chat-panel" role="tabpanel" aria-labelledby="tab-chat">
+        <div id="chat-log"></div>
+        <form id="chat-form">
+          <input id="chat-input" type="text" placeholder="Select a repo to start chatting" disabled required />
+          <button id="chat-send" type="submit" disabled>Send</button>
+        </form>
+      </div>
+
+      <div id="analysis-panel" role="tabpanel" aria-labelledby="tab-analysis" hidden>
+        <p class="hint">
+          Read-only analysis by the Repository Operations Agent. Every finding
+          carries its source location, how it was detected and how much to
+          trust it.
+        </p>
+
+        <div class="toolbar">
+          <button id="btn-inventory" type="button" disabled>Inventory</button>
+          <button id="btn-oop" type="button" disabled>OOP analysis</button>
+          <button id="btn-diagrams" type="button" disabled>Diagrams</button>
+          <button id="btn-tools" type="button">Tool status</button>
+        </div>
+
+        <label class="inline" for="diagram-kinds">Diagrams to generate</label>
+        <div id="diagram-kinds" class="chips">
+          <label><input type="checkbox" value="class" checked /> Class</label>
+          <label><input type="checkbox" value="inheritance" checked /> Inheritance</label>
+          <label><input type="checkbox" value="dependency" checked /> Package deps</label>
+          <label><input type="checkbox" value="component" /> Components</label>
+        </div>
+
+        <p id="analysis-status" role="status"></p>
+        <div id="analysis-output"></div>
+      </div>
     </section>
   </main>
 
   <script src="/app.js"></script>
+  <script src="/analysis.js"></script>
 </body>
 </html>

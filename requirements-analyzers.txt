@@ -1,0 +1,18 @@
+# Optional analyzer dependencies for the Repository Operations Agent.
+#
+# Without these the agent still analyzes Go, Java, JavaScript and TypeScript
+# using its built-in lexical analyzers — same declarations and relationships,
+# reported at medium confidence. Installing them switches those four languages
+# to real syntax-tree parsing (high confidence) and enables receiver-typed call
+# resolution, with no code or configuration change.
+#
+#     pip install -r requirements-analyzers.txt
+#
+# Python needs nothing here: the standard library's `ast` module already
+# provides a first-party parser.
+
+tree-sitter>=0.23,<1.0
+tree-sitter-go>=0.23
+tree-sitter-java>=0.23
+tree-sitter-javascript>=0.23
+tree-sitter-typescript>=0.23
